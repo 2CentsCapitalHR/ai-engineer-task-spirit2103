@@ -1,27 +1,28 @@
-# 🏛️ ADGM Corporate Agent – RAG + Groq AI
+# 📄 Corporate Agent – ADGM Document Compliance Analyzer
 
-An AI-powered compliance assistant that processes **ADGM corporate documents** (`.docx`),  
-detects the **document type**, checks **regulatory compliance**, identifies **missing documents**,  
-and adds **AI review comments** directly into the Word file.
-
-Built with:
-- **[Streamlit](https://streamlit.io/)** – interactive frontend
-- **[LangChain](https://www.langchain.com/)** + **[LangGraph](https://github.com/langchain-ai/langgraph)** – agent orchestration
-- **Groq API** with **Qwen LLM** – fast, low-latency AI reasoning
-- **HuggingFace Embeddings** – semantic matching for inline comments
-- **Python-Docx** – DOCX reading & writing
+**Corporate Agent** is an AI-powered system that analyzes corporate DOCX documents for **completeness**, **compliance**, and **recommendations** based on **ADGM regulations**.  
+It uses **FastAPI** for the backend and **Streamlit** for the frontend, with AI models to detect document type, review content, and flag compliance issues.
 
 ---
 
-## 📌 Features
-✅ **Multi-file upload** – Analyze multiple `.docx` files at once  
-✅ **Document type detection** – Using Groq LLM + keyword fallback  
-✅ **Compliance checking** – Against ADGM regulatory checklists  
-✅ **Missing document detection** – Based on company process type  
-✅ **AI-annotated DOCX** – Inline comments with improvement suggestions  
-✅ **JSON compliance report** – For easy system integration  
-✅ **Fuzzy matching** – Handles variations in document titles  
+## 🛠 Tech Stack
+- **Backend:** FastAPI, LangChain, HuggingFace, Groq
+- **Frontend:** Streamlit
+- **AI Models:** all-MiniLM-L6-v2, Groq LLM
+- **Document Processing:** python-docx
+- **Vector Search:** FAISS
+- **Other:** NumPy, Pandas, python-dotenv, Requests
 
+---
+
+## 🚀 Features
+- 📂 **Multi-file DOCX upload**
+- 🤖 **AI-powered document type detection**
+- ✅ **Automated compliance checks** (against ADGM regulations)
+- 📝 **Detailed AI-generated reviews & recommendations**
+- 💬 **AI comments added directly into DOCX**
+- 📥 **Download reviewed DOCX & JSON reports**
+- 🔄 **Backend–frontend separation for scalability**
 
 ---
 
