@@ -34,10 +34,3 @@ dist/
 
 # Streamlit cache
 .streamlit/
-
-# Uploaded docs & generated outputs
-uploads/
-reviewed_docs/
-*.docx
-*.pdf
-*.json
