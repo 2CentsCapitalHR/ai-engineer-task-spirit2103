@@ -32,20 +32,25 @@ Built with:
 git clone https://github.com/<your-username>/adgm-corporate-agent.git
 cd adgm-corporate-agent
 
-### 2. CREATE AND ACTIVATE VIRTUAL ENVIRNMENT
+2. CREATE AND ACTIVATE VIRTUAL ENVIRNMENT
 python -m venv venv
 # Windows
 venv\Scripts\activate
 # Mac/Linux
 source venv/bin/activate
 
-### 3. iNSTALL DEPENDENCY
+3. iNSTALL DEPENDENCY
 pip install -r requirements.txt
 
-### 4. CREATE .ENV IN HE ROOT FOLDER
+4. CREATE .env IN HE ROOT FOLDER
 GROQ_API_KEY=your_groq_api_key_here
 
 ### 5. RUNNING THE APP
 1. python preprocess.py
 
-2. streamlit run app.py
+2.  cd backend
+    uvicorn main:app --port 7000 --reload
+
+3.  cd frontend
+    streamlit run app.py
+
