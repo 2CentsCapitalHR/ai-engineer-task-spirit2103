@@ -1,0 +1,43 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE configs
+.vscode/
+.idea/
+
+# Environment variables
+.env
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs & temp files
+*.log
+*.tmp
+*.swp
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Streamlit cache
+.streamlit/
+
+# Uploaded docs & generated outputs
+uploads/
+reviewed_docs/
+*.docx
+*.pdf
+*.json

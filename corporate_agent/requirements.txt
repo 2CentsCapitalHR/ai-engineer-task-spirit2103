@@ -1,0 +1,17 @@
+streamlit
+langchain
+langchain-groq
+faiss-cpu
+sentence-transformers
+python-docx
+pypandoc
+tqdm
+python-dotenv
+requests
+typing_extensions
+langchain-community
+unstructured
+pdfminer
+pi_heif
+docx2txt
+langchain-huggingface
