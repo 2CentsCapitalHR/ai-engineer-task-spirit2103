@@ -1,0 +1,49 @@
+{
+  "process": "Private Company Limited",
+  "documents_uploaded": 1,
+  "required_documents": 4,
+  "missing_documents": [
+    "Articles of Association",
+    "Register of Members and Directors",
+    "UBO Declaration Form"
+  ],
+  "issues_found": [
+    {
+      "document": "Board Resolution Templates",
+      "filename": "Templates_SHReso_AmendmentArticles-v1-20220107 (1).docx",
+      "section": "Shareholder's Name",
+      "issue": "The clause is missing a signature block for all shareholders.",
+      "severity": "Medium",
+      "suggestion": "Include a signature block for all shareholders to sign."
+    },
+    {
+      "document": "Board Resolution Templates",
+      "filename": "Templates_SHReso_AmendmentArticles-v1-20220107 (1).docx",
+      "section": "Resolution Text",
+      "issue": "The resolution does not specify the required majority for passing the resolution.",
+      "severity": "Low",
+      "suggestion": "Specify the required majority for passing the resolution."
+    },
+    {
+      "document": "Board Resolution Templates",
+      "filename": "Templates_SHReso_AmendmentArticles-v1-20220107 (1).docx",
+      "section": "Authorised Person",
+      "issue": "The clause does not specify the scope of authority granted to the authorised person.",
+      "severity": "Medium",
+      "suggestion": "Clearly define the scope of authority granted to the authorised person."
+    }
+  ],
+  "reviews": [
+    {
+      "document": "Board Resolution Templates",
+      "filename": "Templates_SHReso_AmendmentArticles-v1-20220107 (1).docx",
+      "summary": "The document is incomplete as it lacks specific details such as company name, date, and authorised person's name.",
+      "recommendations": [
+        "Insert company name and date",
+        "Fill in authorised person's name(s)",
+        "Attach draft articles of association",
+        "Ensure shareholder names are correctly inserted and signed"
+      ]
+    }
+  ]
+}
