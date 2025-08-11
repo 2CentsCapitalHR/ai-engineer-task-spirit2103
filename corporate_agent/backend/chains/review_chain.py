@@ -17,7 +17,7 @@ def build_review_chain():
     )
 
     # Retriever (smaller k for efficiency)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 
     # === Updated Prompt for Structured JSON Output ===
     template = """

@@ -45,5 +45,7 @@ Clause:
         llm=llm,
         retriever=retriever,
         chain_type="stuff",
-        chain_type_kwargs={"prompt": prompt}
+        chain_type_kwargs={"prompt": prompt},
+        return_source_documents=False
     )
+

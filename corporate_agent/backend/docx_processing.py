@@ -7,7 +7,7 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from chains.doc_type_chain import build_doc_type_chain
 from chains.review_chain import build_review_chain
 from chains.compliance_chain import build_compliance_chain
-from utils import simple_keyword_detect, compare_against_checklist, CHECKLISTS
+from utils import compare_against_checklist, CHECKLISTS
 from langchain_huggingface import HuggingFaceEmbeddings
 
 # === Build chains once ===
@@ -17,7 +17,6 @@ compliance_chain = build_compliance_chain()
 embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 
-# === Helper functions ===
 def _safe_parse_json(maybe_json_str):
     """Try to parse a JSON string, else return None."""
     try:
@@ -39,7 +38,7 @@ def _add_comment_below_paragraph(paragraph, comment_text):
     run = comment_para.runs[0]
     run.italic = True
     run.font.size = Pt(9)
-    run.font.color.rgb = RGBColor(0, 102, 204)  # blue color for visibility
+    run.font.color.rgb = RGBColor(0, 102, 204)  # blue
 
 
 def _find_best_matching_paragraph(doc, target_text):
@@ -62,7 +61,6 @@ def _find_best_matching_paragraph(doc, target_text):
     return doc.paragraphs[best_idx]
 
 
-# === Main batch function ===
 def analyze_and_comment_docx_batch(docx_bytes_list, uploaded_filenames=None):
     if uploaded_filenames is None:
         uploaded_filenames = [f"doc_{i+1}.docx" for i in range(len(docx_bytes_list))]
@@ -75,22 +73,23 @@ def analyze_and_comment_docx_batch(docx_bytes_list, uploaded_filenames=None):
         doc = Document(io.BytesIO(doc_bytes))
         full_text = "\n".join([p.text for p in doc.paragraphs])
 
-        # === 1. Document type detection ===
+        # === 1. Document type detection (Embeddings only, no keyword fallback) ===
         try:
             ai_doc_type = doc_type_chain.invoke(full_text[:2000])
             if isinstance(ai_doc_type, dict):
                 ai_doc_type = ai_doc_type.get("result") or ai_doc_type.get("answer") or str(ai_doc_type)
             ai_doc_type = str(ai_doc_type).strip().strip('"')
         except Exception:
-            ai_doc_type = "Unknown Document Type"
+            ai_doc_type = None
 
-        keyword_type = simple_keyword_detect(doc_bytes)
-        chosen_type = ai_doc_type if ai_doc_type != "Unknown Document Type" else keyword_type
-        detected_types.append(chosen_type)
+        if not ai_doc_type:
+            ai_doc_type = "Classification Error"
+
+        detected_types.append(ai_doc_type)
 
         # === 2. Review chain (structured JSON) ===
         try:
-            review_prompt = f"Review the following {chosen_type} for completeness and correctness:\n{full_text[:4000]}"
+            review_prompt = f"Review the following {ai_doc_type} for completeness and correctness:\n{full_text[:4000]}"
             review_result = review_chain.invoke(review_prompt)
             if isinstance(review_result, dict):
                 review_result = review_result.get("result") or review_result.get("answer") or str(review_result)
@@ -102,7 +101,7 @@ def analyze_and_comment_docx_batch(docx_bytes_list, uploaded_filenames=None):
 
         # === 3. Compliance chain (strict JSON) ===
         try:
-            compliance_prompt = f"Check compliance for {chosen_type}:\n{full_text[:4000]}"
+            compliance_prompt = f"Check compliance for {ai_doc_type}:\n{full_text[:4000]}"
             compliance_result = compliance_chain.invoke(compliance_prompt)
             if isinstance(compliance_result, dict):
                 compliance_result = compliance_result.get("result") or compliance_result.get("answer") or str(compliance_result)
@@ -124,13 +123,13 @@ def analyze_and_comment_docx_batch(docx_bytes_list, uploaded_filenames=None):
 
         per_file_info.append({
             "filename": filename,
-            "chosen_type": chosen_type,
+            "chosen_type": ai_doc_type,
             "review_json": review_json,
             "compliance_issues": compliance_json,
             "doc_object": doc
         })
 
-    # === 4. Determine process type & checklist ===
+    # === 4. Determine process type ===
     process_scores = {}
     for proc, required_list in CHECKLISTS.items():
         score = sum(1 for r in required_list if r in detected_types)
@@ -167,7 +166,6 @@ def analyze_and_comment_docx_batch(docx_bytes_list, uploaded_filenames=None):
     for pf in per_file_info:
         doc = pf["doc_object"]
 
-        # Structured AI Review Summary
         header_para = doc.add_paragraph("=== AI REVIEW SUMMARY ===")
         header_para.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
         header_para.runs[0].bold = True
@@ -184,7 +182,6 @@ def analyze_and_comment_docx_batch(docx_bytes_list, uploaded_filenames=None):
             for rec in pf["review_json"]["recommendations"]:
                 doc.add_paragraph(f"- {rec}")
 
-        # AI Comments below sections
         for issue in pf["compliance_issues"]:
             sec = issue.get("section", "")
             issue_text = issue.get("issue", "")
@@ -200,13 +197,11 @@ def analyze_and_comment_docx_batch(docx_bytes_list, uploaded_filenames=None):
             else:
                 _add_comment_below_paragraph(doc.paragraphs[0], comment_text)
 
-        # Save reviewed doc
         out_stream = io.BytesIO()
         doc.save(out_stream)
         out_stream.seek(0)
         reviewed_docs.append((pf["filename"], out_stream.read()))
 
-    # === 7. Combined report ===
     combined_report = {
         "process": chosen_process,
         "documents_uploaded": uploaded_docs_count,

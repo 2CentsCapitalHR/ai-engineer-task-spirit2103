@@ -1,32 +1,40 @@
 import json
-from docx import Document
-import io
+from langchain_huggingface import HuggingFaceEmbeddings
 
+# Load checklist mapping
 with open("checklist_mapping.json", "r") as f:
     CHECKLISTS = json.load(f)
 
-KEYWORDS = {
-    "Articles of Association": ["articles of association", "aoa", "articles"],
-    "Memorandum of Association": ["memorandum of association", "moa", "memorandum"],
-    "Incorporation Application Form": ["incorporation application", "application form"],
-    "UBO Declaration Form": ["ubo declaration", "ultimate beneficial owner"],
-    "Register of Members and Directors": ["register of members", "register of directors"]
-}
+# Load embeddings model once
+embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-def simple_keyword_detect(docx_bytes: bytes) -> str:
-    doc = Document(io.BytesIO(docx_bytes))
-    text = "\n".join([p.text for p in doc.paragraphs]).lower()
-    for label, kwlist in KEYWORDS.items():
-        if any(kw in text for kw in kwlist):
-            return label
-    return "Unknown Document Type"
+def compare_against_checklist(process: str, uploaded_types: list, similarity_threshold=0.75):
+    """
+    Compare uploaded document types against required documents using embeddings.
+    Returns missing documents even if names are slightly different.
+    """
+    required_docs = CHECKLISTS.get(process, [])
+    missing_docs = []
 
-def compare_against_checklist(process: str, uploaded_types: list):
-    required = CHECKLISTS.get(process, [])
-    missing = [r for r in required if r not in uploaded_types]
+    for req_doc in required_docs:
+        matched = False
+        req_emb = embeddings_model.embed_query(req_doc)
+        for uploaded in uploaded_types:
+            up_emb = embeddings_model.embed_query(uploaded)
+            sim = cosine_similarity(req_emb, up_emb)
+            if sim >= similarity_threshold:
+                matched = True
+                break
+        if not matched:
+            missing_docs.append(req_doc)
+
     return {
         "process": process,
-        "required_documents": required,
+        "required_documents": required_docs,
         "uploaded_documents": uploaded_types,
-        "missing_documents": missing
+        "missing_documents": missing_docs
     }
+
+def cosine_similarity(vec1, vec2):
+    import numpy as np
+    return float(np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2)))
